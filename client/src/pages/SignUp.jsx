@@ -42,6 +42,7 @@ export default function SignUp() {
       }
       setLoading(false);
       setError(null);
+      // navigate to the sign in page after signing up
       navigate("/sign-in");
     } catch (error) {
       setLoading(false);
