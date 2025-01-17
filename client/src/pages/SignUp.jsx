@@ -1,26 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({
+      // spread form data and add the new value to the id of the input
       ...formData,
       [e.target.id]: e.target.value,
     });
   };
+
+  // post the form data to the server, prevent the default form submission to refresh the page
+  // use setLoad to show loading state
+  // use setError to show error message
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
-    console.log(data);
+    // add and try and catch for the front end
+    try {
+      setLoading(true);
+      // post the form data to the server
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      // get the response from the server
+      const data = await res.json();
+      if (data.success === false) {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+      setError(null);
+      navigate("/sign-in");
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+
   };
 
   return (
@@ -48,8 +75,8 @@ export default function SignUp() {
           id="password"
           onChange={handleChange}
         />
-        <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-85 disabled:opacity-70">
-          Sign up
+        <button disabled={loading} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-85 disabled:opacity-70">
+          {loading ? "Loading..." : "Sign up"}
         </button>
       </form>
       <div className="flex gap-2 mt-5">
@@ -58,6 +85,7 @@ export default function SignUp() {
           <span className="text-blue-700">Sign in</span>
         </Link>
       </div>
+      {error && <p className="text-red-500 mt-3">{error}</p>}
     </div>
   );
 }
