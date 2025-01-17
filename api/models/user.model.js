@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
     // timestamps are used to track when the document was created and last updated
 }, {timestamps: true});
 
+// create a model from the schema
 const User = mongoose.model('User', userSchema);
 
 export default User;
