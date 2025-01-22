@@ -17,6 +17,7 @@ const app = express();
 
 app.use(express.json());
 
+// add cookie parser middleware to get information from cookies
 app.use(cookieParser());
 
 app.listen(3000, () => {
