@@ -1,5 +1,6 @@
 // this file contains the user slice which is responsible for handling the user state in the redux store
 import { createSlice, current } from "@reduxjs/toolkit";
+import { deleteUser } from "firebase/auth";
 
 // initial state of the user slice
 const initialState = {
@@ -37,9 +38,21 @@ const userSlice = createSlice({
             state.error = action.payload;
             state.loading = false;
         },
+        deleteUserStart: (state) => {
+            state.loading = true;
+        },
+        deleteUserSuccess: (state) => {
+            state.currentUser = null;
+            state.loading = false;
+            state.error = null;
+        },
+        deleteUserFailure: (state, action) => {
+            state.error = action.payload;
+            state.loading = false;
+        },
     }
 });
 
-export const { signInStart, signInSuccess, signInFailure, updateUserStart, updateUserSuccess, updateUserFailure } = userSlice.actions;
+export const { signInStart, signInSuccess, signInFailure, updateUserStart, updateUserSuccess, updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure } = userSlice.actions;
 
 export default userSlice.reducer;
