@@ -7,7 +7,7 @@ export const test = (req, res) => {
     res.json({message: 'Hello World!'});
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
     // check the user id in the request object and compare it with the id in the params
     if (req.user.id !== req.params.id) 
         return next(errorHandler(401, 'Not Authorized to update this user'))
