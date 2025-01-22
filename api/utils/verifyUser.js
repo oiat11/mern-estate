@@ -18,6 +18,7 @@ export const verifyToken = (req, res, next) => {
 
         // set the user in the request object so it can be accessed in the next middleware
         req.user = user;
+        console.log(user);
         next();
     });
 };
