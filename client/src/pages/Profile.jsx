@@ -10,6 +10,7 @@ import {
 } from "firebase/storage";
 import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess, signOutUserStart, signOutUserSuccess, signOutUserFailure } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
+import {Link} from 'react-router-dom';
 
 export default function Profile() {
   // the fileRef is used to reference the file input element to open the file dialog when the user clicks on the profile picture, so that we can hide the input element
@@ -197,6 +198,7 @@ const handleSignOut = async () => {
         <button disabled={loading} onClick={handleSubmit} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-85 disabled:75">
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link className="bg-green-700 p-3 rounded-lg uppercase text-center hover:opacity-85"to={"/create-listing"}>Create Listing</Link>
       </form>
       <div className="flex justify-between mt-5">
         <span onClick={handleDeleteUser} className="text-red-700 cursor-pointer">Delete account</span>
