@@ -5,7 +5,8 @@ import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
 import {FaBath, FaBed, FaChair, FaMapMarkedAlt, FaMapMarkerAlt, FaParking, FaShare} from 'react-icons/fa';
-import { set } from "mongoose";
+import { useSelector } from "react-redux";
+import Contact from "../components/Contact";
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -13,28 +14,33 @@ export default function Listing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const {currentUser} = useSelector((state) => state.user);
+  const { id: listingId } = useParams();
+  const [showContact, setShowContact] = useState(false);
 
-  const params = useParams();
+
   useEffect(() => {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/listing/get/${params.id}`);
+        const res = await fetch(`/api/listing/get/${listingId}`);
         const data = await res.json();
         if (data.success === false) {
           setError(true);
           setLoading(false);
           return;
         }
-        setLoading(false);
         setListing(data);
+        setLoading(false);
+        setError(false);
       } catch (error) {
-        setError(error);
+        setError(true);
         setLoading(false);
       }
     };
     fetchListing();
-  }, [params.id]);
+  }, [listingId]);
+
 
   const handleCopy = (event) => {
     event.stopPropagation();
@@ -85,7 +91,7 @@ export default function Listing() {
                     {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
                 </p>
                 {listing.offer && (
-                    <p className="bg-green-900 w-full max-w-[200px] text-white text-center p-2 rounded-md"> ${(+listing.regularPrice - +listing.discountPrice).toLocaleString()} discount</p>
+                    <p className="bg-green-900 w-full max-w-[200px] text-white text-center p-2 rounded-md"> ${(+listing.regularPrice - +listing.discountPrice).toLocaleString('en-US')} discount</p>
                 )}
             </div>
             <p className="text-slate-800"><span className="font-semibold text-black">Description - </span>{listing.description}</p>
@@ -94,7 +100,7 @@ export default function Listing() {
                     <FaBed className="text-lg" /> {listing.bedrooms > 1 ? `${listing.bedrooms} Bedrooms` : `${listing.bedrooms} Bedroom`}
                 </li>
                 <li className="flex items-center gap-1 whitespace-nowrap text-green-800 font-semibold text-sm">
-                    <FaBath className="text-lg" /> {listing.bedroom > 1 ? `${listing.bathrooms} Bathrooms` : `${listing.bathrooms} Bathroom`}
+                    <FaBath className="text-lg" /> {listing.bathrooms > 1 ? `${listing.bathrooms} Bathrooms` : `${listing.bathrooms} Bathroom`}
                 </li>
                 <li className="flex items-center gap-1 whitespace-nowrap text-green-800 font-semibold text-sm">
                     <FaParking className="text-lg" /> {listing.parking ? 'Parking Available' : 'No Parking'}
@@ -103,8 +109,15 @@ export default function Listing() {
                     <FaChair className="text-lg" /> {listing.furnished ? 'Furnished' : 'Unfurnished'}
                 </li>
             </ul>
-          </div>
-        
+
+  {currentUser && listing?.userRef && listing.userRef !== currentUser._id && !showContact && (
+  <button onClick={()=>setShowContact(true)} className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3">
+    Contact landlord
+  </button>
+)}
+{showContact && <Contact listing={listing}/>}
+
+          </div>    
         </div>
       )}
     </main>
