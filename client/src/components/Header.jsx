@@ -12,10 +12,10 @@ export default function Header() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set("searchTerm", searchTerm);
+    urlParams.set('searchTerm', searchTerm);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
-  }
+  };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -40,6 +40,7 @@ export default function Header() {
             type="text"
             placeholder="Search..."
             className="bg-transparent focus:outline-none w-24 sm:w-64"
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           ></input>
           <button><FaSearch className="text-slate-600" /></button>
