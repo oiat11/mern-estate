@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute'
 import CreateListing from './pages/CreateListing'
 import UpdateListing from './pages/UpdateListing'
 import Listing from './pages/Listing'
+import Search from './pages/Search'
 
 export default function App() {
   return <BrowserRouter>
@@ -20,6 +21,7 @@ export default function App() {
     <Route path="/sign-up" element={<SignUp />} />
     <Route path='/listing/:id' element={<Listing />} />
     <Route path="/about" element={<About />} />
+    <Route path="/search" element={<Search />} />
     {/* the Profile route is protected by the PrivateRoute component */}
     <Route element={<PrivateRoute />} >
       <Route path="/profile" element={<Profile />} />
