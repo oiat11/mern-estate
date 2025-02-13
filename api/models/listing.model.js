@@ -13,11 +13,7 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    regularPrice:{
-        type: Number,
-        required: true,
-    },
-    discountPrice:{
+    price:{
         type: Number,
         required: true,
     },
@@ -41,10 +37,6 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    offer:{
-        type: Boolean,
-        required: true,
-    },
     imageUrls:{
         type: Array,
         required: true,
@@ -52,7 +44,19 @@ const listingSchema = new mongoose.Schema({
     userRef:{
         type: String,
         required: true,
-    }
+    },
+    latitute:{
+        type: Number,
+        required: true,
+    },
+    longitude:{
+        type: Number,
+        required: true,
+    },
+    property:{
+        type: String,
+        required: true,
+    },
 }, {timestamps: true});
 
 const Listing = mongoose.model('Listing', listingSchema);

@@ -2,9 +2,12 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
-
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -49,40 +52,68 @@ export default function SignIn() {
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
-
   };
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign in</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="email"
-          placeholder="email"
-          className="border p-3 rounded-lg"
-          id="email"
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          placeholder="password"
-          className="border p-3 rounded-lg"
-          id="password"
-          onChange={handleChange}
-        />
-        <button disabled={loading} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-85 disabled:opacity-70">
-          {loading ? "Loading..." : "Sign in"}
-          
-        </button>
-        <OAuth />
-      </form>
-      <div className="flex gap-2 mt-5">
-        <p>Don't have an account?</p>
-        <Link to={"/sign-up"}>
-          <span className="text-blue-700">Sign up</span>
-        </Link>
+    <div className="max-w-7xl mx-auto p-3">
+      <div className="flex items-center h-screen">
+        {/* Signin Form */}
+        <div className="w-full lg:w-1/3 flex justify-center max-w-7xl mx-auto p-3">
+          <div className="p-3 max-w-md bg-white px-10 py-20 rounded-3xl border-2 border-gray-100 space-y-6">
+            <h1 className="text-5xl font-semibold my-7">Welcome Back</h1>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+              <div className="mb-5 flex flex-col">
+                <label>Email</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full border-2 border-gray-100 p-3 rounded-xl mt-1 bg-transparent"
+                  id="email"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-5 flex flex-col gap-1">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  className="w-full border-2 border-gray-100 p-3 rounded-xl mt-1 bg-transparent"
+                  id="password"
+                  onChange={handleChange}
+                />
+              </div>
+
+              <button
+                disabled={loading}
+                className="active:scale-[.98] bg-deepGreen text-white p-3 rounded-xl hover:opacity-85 disabled:opacity-70"
+              >
+                {loading ? "Loading..." : "Sign in"}
+              </button>
+              <OAuth />
+            </form>
+
+            <div className="flex mt-5 justify-between">
+              <div className="flex gap-1 text-sm">
+                <Link to={"/sign-up"}>
+                  <span className="text-mossGreen">Create account</span>
+                </Link>
+              </div>
+              <div className="text-sm text-mossGreen">Forgot Password?</div>
+            </div>
+
+            {error && <p className="text-red-700 mt-5">{error}</p>}
+          </div>
+        </div>
+
+        {/* Picture */}
+        <div className="w-auto lg:w-1/2 hidden lg:flex justify-center items-center pr-5">
+          <img
+            src="https://www.thespruce.com/thmb/M9KPri57C950IxoIloqQd7Uqh6I=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/house-ninedesign-zannaoursurreynest3607-ZrL-ce37a3b733e34ea1a3a2e3f2103e1449.jpeg"
+            alt="SignIn Image"
+            className="w-100 aspect-square object-cover rounded-full"
+          />
+        </div>
       </div>
-      {error && <p className="text-red-700 mt-5">{error}</p>}
     </div>
   );
 }
