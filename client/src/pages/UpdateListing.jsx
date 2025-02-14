@@ -148,7 +148,7 @@ export default function UpdateListing() {
             setLoading(true);
             setError(false);
             const res = await fetch(`/api/listing/update/${params.id}`, {
-                method:"POST",
+                method:"PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
