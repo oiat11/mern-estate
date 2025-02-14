@@ -1,63 +1,65 @@
 import mongoose from 'mongoose';
 
 const listingSchema = new mongoose.Schema({
-    title:{
+    title: {
         type: String,
         required: true,
     },
-    description:{
+    description: {
         type: String,
         required: true,
     },
-    address:{
+    address: {
         type: String,
         required: true,
     },
-    price:{
+    price: {
         type: Number,
         required: true,
     },
-    bathrooms:{
+    bathrooms: {
         type: Number,
         required: true,
     },
-    bedrooms:{
+    bedrooms: {
         type: Number,
         required: true,
     },
-    furnished:{
+    furnished: {
         type: Boolean,
         required: true,
     },
-    parking:{
+    parking: {
         type: Boolean,
         required: true,
     },
-    type:{
+    type: {
         type: String,
         required: true,
+        enum: ['sale', 'rent'],
     },
-    imageUrls:{
+    imageUrls: {
         type: Array,
         required: true,
     },
-    userRef:{
+    userRef: {
         type: String,
         required: true,
     },
-    latitute:{
+    latitute: {
         type: Number,
         required: true,
     },
-    longitude:{
+    longitude: {
         type: Number,
         required: true,
     },
-    property:{
+    property: {
         type: String,
         required: true,
+        enum: ['apartment', 'house', 'condo', 'townhouse'],
     },
-}, {timestamps: true});
+}, { timestamps: true });
 
 const Listing = mongoose.model('Listing', listingSchema);
 
