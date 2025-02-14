@@ -94,6 +94,8 @@ export const getUserListings = async (req, res, next) => {
         if (!user) {
             return next(errorHandler(404, 'User not found'));
         }
+        console.log("Listing ID:", req.params.listingId);
+
         // Check if listing is already saved
         if (user.savedListing.includes(req.params.listingId)) {
             return next(errorHandler(400, 'Listing already saved'));
