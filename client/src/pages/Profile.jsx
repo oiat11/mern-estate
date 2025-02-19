@@ -73,9 +73,9 @@ export default function Profile() {
     };
 
     if (activeTab === "listings") {
-      fetchListings(); // 调用 async 函数
+      fetchListings(); 
     }
-  }, [activeTab, currentUser]); // 确保 currentUser 变化时也能获取数据
+  }, [activeTab, currentUser]);
 
   const handleFileUpload = () => {
     const storage = getStorage();
