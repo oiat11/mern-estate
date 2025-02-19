@@ -18,6 +18,7 @@ import {
   signOutUserFailure,
 } from "../redux/user/userSlice";
 import UserListings from "../components/UserListings.jsx";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef();
@@ -298,23 +299,39 @@ export default function Profile() {
           </div>
         )}
 
-        {activeTab === "listings" && (
-          <div>
-            <h1 className="text-5xl font-semibold">My Listings</h1>
-            <div className="mt-4">
-            {showListingsError ? (
-              <p>Failed to load listings. Try again later.</p>
-            ) : (
-              <UserListings
-                userListings={userListings}
-                handleListingDelete={handleListingDelete}
-              />
-            )}
-            </div>
-          </div>
-        )}
+{activeTab === "listings" && (
+  <div className="flex flex-col gap-6">
+    <div className="flex justify-between items-center">
+      <h1 className="text-5xl font-semibold">My Listings</h1>
+      <Link to="/create-listing">
+        <button type="button" className="bg-deepGreen text-white rounded-lg p-3 hover:opacity-85">
+          Add Listing
+        </button>
+      </Link>
+    </div>
+    <div className="w-full">
+      {showListingsError ? (
+        <div className="text-red-500">
+          <p>Failed to load listings. Try again later.</p>
+          <button
+            onClick={fetchListings}
+            className="mt-2 text-blue-600 underline"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <UserListings
+          userListings={userListings}
+          handleListingDelete={handleListingDelete}
+        />
+      )}
+    </div>
+  </div>
+)}
 
-        {activeTab === "saved" && <div>Saved Properties Content Here</div>}
+
+        {activeTab === "saved" && <h1 className="text-5xl font-semibold">Saved Properties</h1>}
       </div>
     </div>
   );
