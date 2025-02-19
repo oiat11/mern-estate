@@ -7,6 +7,7 @@ import "swiper/css/bundle";
 import {FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare} from 'react-icons/fa';
 import { useSelector } from "react-redux";
 import Contact from "../components/Contact";
+import Map from "../components/GoogleMapComponent ";
 
 export default function Listing() {
   SwiperCore.use([Navigation]);

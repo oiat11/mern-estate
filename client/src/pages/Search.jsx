@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ListingItem from "../components/ListingItem";
 import { set } from "mongoose";
+import GoogleMapComponent from "../components/GoogleMapComponent ";
 
 export default function Search() {
     const navigate = useNavigate();
     const [sidebardata, setSidebarData] = useState({
         searchTerm: "",
         type: "all",
-        offer: false,
         parking: false,
         furnished: false,
         sort: "createdAt",
@@ -27,7 +27,6 @@ export default function Search() {
         const typeFromUrl = urlParams.get('type');
         const parkingFromUrl = urlParams.get('parking');
         const furnishedFromUrl = urlParams.get('furnished');
-        const offerFromUrl = urlParams.get('offer');
         const sortFromUrl = urlParams.get('sort');
         const orderFromUrl = urlParams.get('order');
     
@@ -36,7 +35,7 @@ export default function Search() {
           typeFromUrl ||
           parkingFromUrl ||
           furnishedFromUrl ||
-          offerFromUrl ||
+
           sortFromUrl ||
           orderFromUrl
         ) {
@@ -45,7 +44,7 @@ export default function Search() {
             type: typeFromUrl || 'all',
             parking: parkingFromUrl === 'true' ? true : false,
             furnished: furnishedFromUrl === 'true' ? true : false,
-            offer: offerFromUrl === 'true' ? true : false,
+
             sort: sortFromUrl || 'created_at',
             order: orderFromUrl || 'desc',
           });
@@ -78,7 +77,7 @@ export default function Search() {
             setSidebarData({...sidebardata, searchTerm: e.target.value});
         }
 
-        if (e.target.id === 'offer' || e.target.id === 'parking' || e.target.id === 'furnished') {
+        if (e.target.id === 'parking' || e.target.id === 'furnished') {
             setSidebarData({...sidebardata, [e.target.id]: e.target.checked || e.target.checked === 'true' ? true : false});
         }
 
@@ -96,7 +95,6 @@ export default function Search() {
         urlParams.set('type', sidebardata.type);
         urlParams.set('parking', sidebardata.parking);
         urlParams.set('furnished', sidebardata.furnished);
-        urlParams.set('offer', sidebardata.offer);
         urlParams.set('sort', sidebardata.sort);
         urlParams.set('order', sidebardata.order);
         const searchQuery = urlParams.toString();
@@ -209,21 +207,40 @@ export default function Search() {
                 </form>
             </div>
             <div className="flex-1">
-                <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-5">Listing results: </h1>
-                <div className="p-7 flex flex-wrap gap-4">{!loading && listings.length === 0 && (
-                    <p className="text-xl text-slate-700">No listing found!</p>
-                )}
-                {loading && (
-                    <p className="text-xl text-slate-700 text-center w-full">Loading...</p>
-                )}
-                {!loading && listings && listings.map((listing) => (
-                        <ListingItem key={listing._id} listing={listing}/>
-                    ))
-                }
+                <div className="sticky top-0 z-10">
+                    <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-5">
+                        Listing results:
+                    </h1>
                 </div>
-                {showMore && (
-                    <button onClick={onShowMoreClick} className='text-green-700 hover:underline p-7 text-center w-full'>Show more</button>
-                )}
+                
+                <div className="flex flex-row gap-4">
+                    <div className="p-7 flex-1">
+                        <div className="h-[calc(100vh-150px)] overflow-y-auto scrollbar-hide">
+                            {!loading && listings.length === 0 && (
+                                <p className="text-xl text-slate-700">No listing found!</p>
+                            )}
+                            {loading && (
+                                <p className="text-xl text-slate-700 text-center w-full">Loading...</p>
+                            )}
+                            <div className="flex flex-wrap gap-4">
+                                {!loading && listings && listings.map((listing) => (
+                                    <ListingItem key={listing._id} listing={listing}/>
+                                ))}
+                            </div>
+                            {showMore && (
+                                <button onClick={onShowMoreClick} className='text-green-700 hover:underline p-7 text-center w-full'>
+                                    Show more
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="hidden lg:block w-[500px] sticky top-[88px]">
+                        <div className="h-[calc(100vh-88px)]">
+                            <GoogleMapComponent listings={listings} />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
