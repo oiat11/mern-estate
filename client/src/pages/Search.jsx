@@ -235,8 +235,8 @@ export default function Search() {
                         </div>
                     </div>
 
-                    <div className="hidden lg:block w-[500px] sticky top-[88px]">
-                        <div className="h-[calc(100vh-88px)]">
+                    <div className="hidden lg:block w-[400px] sticky top-[88px]">
+                        <div className="h-[calc(100vh-88px)] border-1 border-slate-300 rounded-lg shadow-md p-2 ">
                             <GoogleMapComponent listings={listings} />
                         </div>
                     </div>
