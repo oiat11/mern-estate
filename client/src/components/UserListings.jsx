@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { CiEdit } from "react-icons/ci";
-import { MdLocationOn, MdDeleteOutline } from 'react-icons/md';
+import { MdLocationOn, MdDeleteOutline, MdBookmarkAdd } from 'react-icons/md';
 
-const UserListings = ({ userListings, handleListingDelete }) => {
+const UserListings = ({ userListings, handleListingDelete, listingType, handleUnsave }) => {
   if (!userListings || userListings.length === 0) {
     return null;
   }
@@ -25,11 +25,28 @@ const UserListings = ({ userListings, handleListingDelete }) => {
             </Link>
 
             <div className="absolute top-0 right-0">
-              <Link to={`/update-listing/${listing._id}`}>
-                <button className="text-mossGreen hover:opacity-75">
-                  <CiEdit className="h-6 w-6" />
+              {listingType === "my-listings" ? (
+                <>
+                  <Link to={`/update-listing/${listing._id}`}>
+                    <button className="text-mossGreen hover:opacity-75">
+                      <CiEdit className="h-6 w-6" />
+                    </button>
+                  </Link>
+                  <button 
+                    onClick={() => handleListingDelete(listing._id)} 
+                    className="text-deepGreen hover:opacity-75 ml-4"
+                  >
+                    <MdDeleteOutline className="h-6 w-6" />
+                  </button>
+                </>
+              ) : (
+                <button 
+                  onClick={() => handleUnsave(listing._id)}
+                  className="text-deepGreen hover:opacity-75"
+                >
+                  <MdBookmarkAdd className="h-6 w-6" />
                 </button>
-              </Link>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-gray-500 mb-2">
@@ -40,15 +57,6 @@ const UserListings = ({ userListings, handleListingDelete }) => {
             <p className="bg-lightGreen max-w-[80px] text-deepGreen text-semibold text-sm p-1.5 rounded-md text-center">
               ${listing.price}
             </p>
-
-            <div className="absolute bottom-0 right-0">
-              <button 
-                onClick={() => handleListingDelete(listing._id)} 
-                className="text-deepGreen hover:opacity-75"
-              >
-                <MdDeleteOutline className="h-6 w-6" />
-              </button>
-            </div>
           </div>
         </div>
       ))}

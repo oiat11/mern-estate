@@ -32,6 +32,9 @@ export default function Profile() {
   const dispatch = useDispatch();
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [loadingSaved, setLoadingSaved] = useState(false);
+  const [errorSaved, setErrorSaved] = useState(null);
+  const [savedListings, setSavedListings] = useState([]);
 
   useEffect(() => {
     if (file) {
@@ -76,6 +79,40 @@ export default function Profile() {
       fetchListings(); 
     }
   }, [activeTab, currentUser]);
+
+  useEffect(() => {
+    const fetchSavedListings = async () => {
+      if (activeTab === "saved") {
+        try {
+          setLoadingSaved(true);
+          setErrorSaved(null);
+          
+          const res = await fetch('/api/user/get-saved-listings', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+          });
+          
+          const data = await res.json();
+          
+          if (data.success === false) {
+            throw new Error(data.message);
+          }
+          
+          setSavedListings(data.listings);
+        } catch (error) {
+          console.error('Error fetching saved listings:', error);
+          setErrorSaved(error.message || 'Failed to fetch saved listings');
+        } finally {
+          setLoadingSaved(false);
+        }
+      }
+    };
+
+    fetchSavedListings();
+  }, [activeTab]);
 
   const handleFileUpload = () => {
     const storage = getStorage();
@@ -180,6 +217,30 @@ export default function Profile() {
       }
     } catch (error) {
       console.error("Error deleting listing:", error);
+    }
+  };
+
+  const handleUnsave = async (listingId) => {
+    try {
+      const res = await fetch(`/api/user/saved/${listingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        setSavedListings(prev => prev.filter(listing => listing._id !== listingId));
+        dispatch(updateUserSuccess({
+          ...currentUser,
+          savedListing: currentUser.savedListing.filter(id => id !== listingId)
+        }));
+      } else {
+        console.error('Failed to unsave listing');
+      }
+    } catch (error) {
+      console.error('Error removing saved listing:', error);
     }
   };
 
@@ -331,8 +392,30 @@ export default function Profile() {
 )}
 
 
-        {activeTab === "saved" && <h1 className="text-5xl font-semibold">Saved Properties</h1>}
+{activeTab === "saved" && (
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-5xl font-semibold">Saved Properties</h1>
+            </div>
+            <div className="w-full">
+              {loadingSaved ? (
+                <p>Loading saved properties...</p>
+              ) : errorSaved ? (
+                <p className="text-red-500">{errorSaved}</p>
+              ) : savedListings.length > 0 ? (
+                <UserListings
+                  userListings={savedListings}
+                  listingType="saved"
+                  handleUnsave={handleUnsave}
+                />
+              ) : (
+                <p>No saved listings</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+

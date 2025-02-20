@@ -87,10 +87,35 @@ export const getUserListings = async (req, res, next) => {
     }
 };
 
+export const getSavedListings = async (req, res, next) => {
+  try {
+    // Get the user from the token
+    const user = await User.findById(req.user.id).populate('savedListing');
+    
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
+    // Get all saved listings
+    const listings = await Listing.find({
+      _id: { $in: user.savedListing }
+    });
+
+    res.status(200).json({
+      success: true,
+      listings
+    });
+
+  } catch (error) {
+    console.error('Error in getSavedListings:', error); // Add this for debugging
+    next(error);
+  }
+};
+  
 
   export const addSavedListing = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id); // Corrected
+        const user = await User.findById(req.user.id);
         if (!user) {
             return next(errorHandler(404, 'User not found'));
         }
