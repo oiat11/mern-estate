@@ -385,6 +385,7 @@ export default function Profile() {
         <UserListings
           userListings={userListings}
           handleListingDelete={handleListingDelete}
+          listingType="my-listings"
         />
       )}
     </div>

@@ -10,7 +10,7 @@ const UserListings = ({ userListings, handleListingDelete, listingType, handleUn
   return (
     <div className="flex flex-col gap-4">
       {userListings.map((listing) => (
-        <div key={listing._id} className="flex gap-6 p-4">
+        <div key={listing._id} className="flex gap-6 p-4 relative border rounded-lg">
           <img 
             src={listing.imageUrls[0]} 
             alt="listing cover" 
@@ -26,19 +26,11 @@ const UserListings = ({ userListings, handleListingDelete, listingType, handleUn
 
             <div className="absolute top-0 right-0">
               {listingType === "my-listings" ? (
-                <>
-                  <Link to={`/update-listing/${listing._id}`}>
-                    <button className="text-mossGreen hover:opacity-75">
-                      <CiEdit className="h-6 w-6" />
-                    </button>
-                  </Link>
-                  <button 
-                    onClick={() => handleListingDelete(listing._id)} 
-                    className="text-deepGreen hover:opacity-75 ml-4"
-                  >
-                    <MdDeleteOutline className="h-6 w-6" />
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button className="text-mossGreen hover:opacity-75">
+                    <CiEdit className="h-6 w-6" />
                   </button>
-                </>
+                </Link>
               ) : (
                 <button 
                   onClick={() => handleUnsave(listing._id)}
@@ -57,6 +49,17 @@ const UserListings = ({ userListings, handleListingDelete, listingType, handleUn
             <p className="bg-lightGreen max-w-[80px] text-deepGreen text-semibold text-sm p-1.5 rounded-md text-center">
               ${listing.price}
             </p>
+
+            {listingType === "my-listings" && (
+              <div className="absolute bottom-0 right-0">
+                <button 
+                  onClick={() => handleListingDelete(listing._id)} 
+                  className="text-deepGreen hover:opacity-75"
+                >
+                  <MdDeleteOutline className="h-6 w-6" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}
