@@ -48,15 +48,15 @@ const listingSchema = new mongoose.Schema({
     },
     latitute: {
         type: Number,
-        required: true,
+        required: false,
     },
     longitude: {
         type: Number,
-        required: true,
+        required: false,
     },
     property: {
         type: String,
-        required: true,
+        required: false,
         enum: ['apartment', 'house', 'condo', 'townhouse'],
     },
 }, { timestamps: true });

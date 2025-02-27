@@ -6,8 +6,8 @@ import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
 import {FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare} from 'react-icons/fa';
 import { useSelector } from "react-redux";
-import Contact from "../components/Contact";
-import Map from "../components/GoogleMapComponent ";
+import MapComponent from "../components/GoogleMapComponent ";
+import axios from 'axios';
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -17,8 +17,9 @@ export default function Listing() {
   const [copied, setCopied] = useState(false);
   const {currentUser} = useSelector((state) => state.user);
   const { id: listingId } = useParams();
-  const [showContact, setShowContact] = useState(false);
 
+  const [listingCenter, setListingCenter] = useState({ lat: 51.505, lng: -0.09 }); 
+  const [listingMarkers, setListingMarkers] = useState([]);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -34,14 +35,32 @@ export default function Listing() {
         setListing(data);
         setLoading(false);
         setError(false);
+
+        // Call the Geocoding API to get lat and long from the address
+        if (data.address) {
+          const geocodeResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+            params: {
+              address: data.address,
+              key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+            },
+          });
+
+          if (geocodeResponse.data.status === 'OK') {
+            const location = geocodeResponse.data.results[0].geometry.location;
+            setListingCenter({ lat: location.lat, lng: location.lng });
+            setListingMarkers([{ id: 'marker', position: { lat: location.lat, lng: location.lng } }]);
+          } else {
+            console.error('Geocoding error:', geocodeResponse.data.status);
+          }
+        }
       } catch (error) {
         setError(true);
         setLoading(false);
+        console.error('Error fetching listing or geocode:', error);
       }
     };
     fetchListing();
   }, [listingId]);
-
 
   const handleCopy = (event) => {
     event.stopPropagation();
@@ -49,7 +68,6 @@ export default function Listing() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
 
   return (
     <main>
@@ -80,10 +98,10 @@ export default function Listing() {
             <p className="text-2xl font-semibold">
                 {listing.title}
             </p>
-            <p>{
-                 listing.price.toLocaleString('en-US')
-                }
-                {listing.type ==='rent' ? ' / month' : ''}</p>
+            <p ><span className="text-4xl font-semibold">
+                {listing.price.toLocaleString('en-US')}
+                </span>
+                <span className="text-2xl">{listing.type ==='rent' ? ' / month' : ''}</span></p>
             <p className="flex items-center mt-6 gap-2 text-slate-600 my-2 text-sm">
                 <FaMapMarkerAlt className="text-green-700" />
                 {listing.address}
@@ -108,8 +126,7 @@ export default function Listing() {
                     <FaChair className="text-lg" /> {listing.furnished ? 'Furnished' : 'Unfurnished'}
                 </li>
             </ul>
-
-
+            <MapComponent center={listingCenter} markers={listingMarkers} />
           </div>    
         </div>
       )}

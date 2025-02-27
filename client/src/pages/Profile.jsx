@@ -204,19 +204,33 @@ export default function Profile() {
   };
 
   const handleListingDelete = async (listingId) => {
+    // Optimistically remove the listing from the state
+    setUserListings((prevListings) =>
+      prevListings.filter((listing) => listing._id !== listingId)
+    );
+
     try {
-      const res = await fetch(`/api/listings/delete/${listingId}`, {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
         method: "DELETE",
       });
 
+      if (!res.ok) {
+        const errorMessage = await res.text(); // Get the response text
+        console.error("Error deleting listing:", errorMessage);
+        throw new Error("Failed to delete listing");
+      }
+
       const data = await res.json();
-      if (data.success) {
-        setUserListings((prevListings) =>
-          prevListings.filter((listing) => listing._id !== listingId)
-        );
+      if (!data.success) {
+        throw new Error("Failed to delete listing");
       }
     } catch (error) {
       console.error("Error deleting listing:", error);
+      // Revert the optimistic update if the delete fails
+      setUserListings((prevListings) => [
+        ...prevListings,
+        { _id: listingId }, // You may need to restore the full listing object
+      ]);
     }
   };
 
