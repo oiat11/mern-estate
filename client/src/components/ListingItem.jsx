@@ -111,9 +111,7 @@ export default function ListingItem({ listing }) {
           </p>
           <p className="text-slate-500 mt-2 font-semibold flex items-center">
             $
-            {listing.offer
-              ? listing.discountPrice.toLocaleString("en-US")
-              : listing.regularPrice.toLocaleString("en-US")}
+            {listing.price.toLocaleString("en-US")}
             {listing.type === "rent" && "/ month"}
           </p>
           <div className="flex items-center gap-4 text-slate-700">
