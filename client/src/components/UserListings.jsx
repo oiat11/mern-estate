@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { CiEdit } from "react-icons/ci";
+import { MdLocationOn, MdDeleteOutline, MdBookmarkAdd } from 'react-icons/md';
 
-const UserListings = ({ userListings, handleListingDelete }) => {
+const UserListings = ({ userListings, handleListingDelete, listingType, handleUnsave }) => {
   if (!userListings || userListings.length === 0) {
     return null;
   }
@@ -8,16 +10,56 @@ const UserListings = ({ userListings, handleListingDelete }) => {
   return (
     <div className="flex flex-col gap-4">
       {userListings.map((listing) => (
-        <div key={listing._id} className="border rounded-lg p-3 flex justify-between items-center gap-4">
-          <Link to={`/listing/${listing._id}`} className="flex items-center gap-4 flex-1">
-            <img src={listing.imageUrls[0]} alt='listing cover' className="h-16 w-16 object-contain" />
-            <p className="text-slate-700 font-semibold hover:underline truncate">{listing.title}</p>
-          </Link>
-          <div className="flex flex-col items-center">
-            <button onClick={() => handleListingDelete(listing._id)} className="text-red-700 uppercase">Delete</button>
-            <Link to={`/update-listing/${listing._id}`}>
-              <button className="text-green-700 uppercase">Edit</button>
+        <div key={listing._id} className="flex gap-6 p-4 relative border rounded-lg">
+          <img 
+            src={listing.imageUrls[0]} 
+            alt="listing cover" 
+            className="h-48 w-60 object-cover rounded-lg"
+          />
+
+          <div className="flex flex-col flex-1 justify-start gap-4 relative">
+            <Link to={`/listing/${listing._id}`}>
+              <p className="text-deepGreen font-semibold text-xl hover:underline truncate mb-2">
+                {listing.title}
+              </p>
             </Link>
+
+            <div className="absolute top-0 right-0">
+              {listingType === "my-listings" ? (
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button className="text-mossGreen hover:opacity-75">
+                    <CiEdit className="h-6 w-6" />
+                  </button>
+                </Link>
+              ) : (
+                <button 
+                  onClick={() => handleUnsave(listing._id)}
+                  className="text-deepGreen hover:opacity-75"
+                >
+                  <MdBookmarkAdd className="h-6 w-6" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 text-gray-500 mb-2">
+              <MdLocationOn className="h-5 w-5 text-mossGreen" />
+              <p>{listing.address}</p>
+            </div>
+
+            <p className="bg-lightGreen max-w-[80px] text-deepGreen text-semibold text-sm p-1.5 rounded-md text-center">
+              ${listing.price}
+            </p>
+
+            {listingType === "my-listings" && (
+              <div className="absolute bottom-0 right-0">
+                <button 
+                  onClick={() => handleListingDelete(listing._id)} 
+                  className="text-deepGreen hover:opacity-75"
+                >
+                  <MdDeleteOutline className="h-6 w-6" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}

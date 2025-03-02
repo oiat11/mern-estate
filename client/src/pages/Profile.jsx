@@ -18,6 +18,7 @@ import {
   signOutUserFailure,
 } from "../redux/user/userSlice";
 import UserListings from "../components/UserListings.jsx";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef();
@@ -31,6 +32,9 @@ export default function Profile() {
   const dispatch = useDispatch();
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [loadingSaved, setLoadingSaved] = useState(false);
+  const [errorSaved, setErrorSaved] = useState(null);
+  const [savedListings, setSavedListings] = useState([]);
 
   useEffect(() => {
     if (file) {
@@ -72,9 +76,43 @@ export default function Profile() {
     };
 
     if (activeTab === "listings") {
-      fetchListings(); // 调用 async 函数
+      fetchListings(); 
     }
-  }, [activeTab, currentUser]); // 确保 currentUser 变化时也能获取数据
+  }, [activeTab, currentUser]);
+
+  useEffect(() => {
+    const fetchSavedListings = async () => {
+      if (activeTab === "saved") {
+        try {
+          setLoadingSaved(true);
+          setErrorSaved(null);
+          
+          const res = await fetch('/api/user/get-saved-listings', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+          });
+          
+          const data = await res.json();
+          
+          if (data.success === false) {
+            throw new Error(data.message);
+          }
+          
+          setSavedListings(data.listings);
+        } catch (error) {
+          console.error('Error fetching saved listings:', error);
+          setErrorSaved(error.message || 'Failed to fetch saved listings');
+        } finally {
+          setLoadingSaved(false);
+        }
+      }
+    };
+
+    fetchSavedListings();
+  }, [activeTab]);
 
   const handleFileUpload = () => {
     const storage = getStorage();
@@ -166,19 +204,57 @@ export default function Profile() {
   };
 
   const handleListingDelete = async (listingId) => {
+    // Optimistically remove the listing from the state
+    setUserListings((prevListings) =>
+      prevListings.filter((listing) => listing._id !== listingId)
+    );
+
     try {
-      const res = await fetch(`/api/listings/delete/${listingId}`, {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
         method: "DELETE",
       });
 
+      if (!res.ok) {
+        const errorMessage = await res.text(); // Get the response text
+        console.error("Error deleting listing:", errorMessage);
+        throw new Error("Failed to delete listing");
+      }
+
       const data = await res.json();
-      if (data.success) {
-        setUserListings((prevListings) =>
-          prevListings.filter((listing) => listing._id !== listingId)
-        );
+      if (!data.success) {
+        throw new Error("Failed to delete listing");
       }
     } catch (error) {
       console.error("Error deleting listing:", error);
+      // Revert the optimistic update if the delete fails
+      setUserListings((prevListings) => [
+        ...prevListings,
+        { _id: listingId }, // You may need to restore the full listing object
+      ]);
+    }
+  };
+
+  const handleUnsave = async (listingId) => {
+    try {
+      const res = await fetch(`/api/user/saved/${listingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        setSavedListings(prev => prev.filter(listing => listing._id !== listingId));
+        dispatch(updateUserSuccess({
+          ...currentUser,
+          savedListing: currentUser.savedListing.filter(id => id !== listingId)
+        }));
+      } else {
+        console.error('Failed to unsave listing');
+      }
+    } catch (error) {
+      console.error('Error removing saved listing:', error);
     }
   };
 
@@ -298,24 +374,63 @@ export default function Profile() {
           </div>
         )}
 
-        {activeTab === "listings" && (
-          <div>
-            <h1 className="text-5xl font-semibold">My Listings</h1>
-            <div className="mt-4">
-            {showListingsError ? (
-              <p>Failed to load listings. Try again later.</p>
-            ) : (
-              <UserListings
-                userListings={userListings}
-                handleListingDelete={handleListingDelete}
-              />
-            )}
+{activeTab === "listings" && (
+  <div className="flex flex-col gap-6">
+    <div className="flex justify-between items-center">
+      <h1 className="text-5xl font-semibold">My Listings</h1>
+      <Link to="/create-listing">
+        <button type="button" className="bg-deepGreen text-white rounded-lg p-3 hover:opacity-85">
+          Add Listing
+        </button>
+      </Link>
+    </div>
+    <div className="w-full">
+      {showListingsError ? (
+        <div className="text-red-500">
+          <p>Failed to load listings. Try again later.</p>
+          <button
+            onClick={fetchListings}
+            className="mt-2 text-blue-600 underline"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <UserListings
+          userListings={userListings}
+          handleListingDelete={handleListingDelete}
+          listingType="my-listings"
+        />
+      )}
+    </div>
+  </div>
+)}
+
+
+{activeTab === "saved" && (
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-5xl font-semibold">Saved Properties</h1>
+            </div>
+            <div className="w-full">
+              {loadingSaved ? (
+                <p>Loading saved properties...</p>
+              ) : errorSaved ? (
+                <p className="text-red-500">{errorSaved}</p>
+              ) : savedListings.length > 0 ? (
+                <UserListings
+                  userListings={savedListings}
+                  listingType="saved"
+                  handleUnsave={handleUnsave}
+                />
+              ) : (
+                <p>No saved listings</p>
+              )}
             </div>
           </div>
         )}
-
-        {activeTab === "saved" && <div>Saved Properties Content Here</div>}
       </div>
     </div>
   );
 }
+
