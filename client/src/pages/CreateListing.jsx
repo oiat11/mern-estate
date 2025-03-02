@@ -20,7 +20,6 @@ export default function CreateListing() {
         bedrooms: 1,
         bathrooms: 1,
         price: 0,
-        offer: false,
         parking: false,
         furnished: false,
     });
@@ -107,11 +106,11 @@ export default function CreateListing() {
         if (e.target.id === 'sale' || e.target.id === 'rent') {
             setFormData({
                 ...formData,
-                type: e.target.checked ? e.target.id : '', // Clear type if unchecked
+                type: e.target.checked ? e.target.id : '', 
             });
         }
 
-        if(e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer'){
+        if(e.target.id === 'parking' || e.target.id === 'furnished'){
             setFormData({
                 ...formData,
                 [e.target.id]: e.target.checked,
@@ -204,10 +203,6 @@ export default function CreateListing() {
                         <div className="flex gap-2">
                             <input type="checkbox" id="furnished" className="w-5" onChange={handleChange} checked={formData.furnished}/>
                             <span>Furnished</span>
-                        </div>
-                        <div className="flex gap-2">
-                            <input type="checkbox" id="offer" className="w-5" onChange={handleChange} checked={formData.offer}/>
-                            <span>Offer</span>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-6">
